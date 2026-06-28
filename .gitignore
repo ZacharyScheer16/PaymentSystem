@@ -1,0 +1,15 @@
+# Created by venv; see https://docs.python.org/3/library/venv.html
+
+# Ignore backend stuff
+p2p_backend/venv/
+p2p_backend/__pycache__/
+p2p_backend/.env
+
+# Ignore frontend stuff
+p2p_frontend/node_modules/
+p2p_frontend/dist/
+p2p_frontend/.env
+
+# Ignore global junk
+.DS_Store
+*.db
