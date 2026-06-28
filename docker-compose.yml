@@ -1,0 +1,181 @@
+# ============================================================================
+# Docker Compose Configuration for Payment Project
+# ============================================================================
+#
+# SETUP INSTRUCTIONS:
+# ===================
+# 1. Copy .env.example to .env (this is where Docker Compose reads variables)
+#    cp .env.example .env
+#
+# 2. Edit .env and update values as needed (especially POSTGRES_PASSWORD)
+#
+# 3. Make sure Docker and Docker Compose are installed
+#
+# QUICK START GUIDE:
+# ================
+# 1. From the PaymentProject root directory, run:
+#    docker-compose up --build
+#
+# 2. Access the application:
+#    - Frontend: http://localhost:3000
+#    - Backend API: http://localhost:8000
+#    - API Docs: http://localhost:8000/docs
+#
+# 3. To stop the containers:
+#    docker-compose down
+#
+# 4. To view logs:
+#    docker-compose logs -f [service-name]
+#    (service names: frontend, backend, db)
+#
+# 5. To rebuild only one service:
+#    docker-compose up --build frontend
+#
+# 6. To reset everything (including database):
+#    docker-compose down -v
+#
+# ============================================================================
+
+version: '3.8'
+
+services:
+  # =========================================================================
+  # FRONTEND SERVICE - React + Vite served by Nginx
+  # =========================================================================
+  frontend:
+    container_name: p2p-frontend
+    build:
+      context: ./p2p_Frontend
+      dockerfile: DockerFile
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"  # Port from .env, defaults to 3000
+    env_file:
+      - .env  # Load environment variables from .env file
+    environment:
+      - REACT_APP_API_URL=${REACT_APP_API_URL}  # API URL from .env
+    depends_on:
+      - backend  # Ensures backend starts before frontend
+    networks:
+      - payment-network
+    restart: unless-stopped
+    # Health check to verify the frontend is running
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # =========================================================================
+  # BACKEND SERVICE - FastAPI + Uvicorn
+  # =========================================================================
+  backend:
+    container_name: p2p-backend
+    build:
+      context: ./p2p_Backend
+      dockerfile: Dockerfile
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"  # Port from .env, defaults to 8000
+    env_file:
+      - .env  # Load environment variables from .env file
+    environment:
+      # Backend environment variables
+      - DATABASE_URL=${DATABASE_URL}  # Database URL from .env
+      - ENVIRONMENT=${ENVIRONMENT}  # Environment from .env
+      - CORS_ORIGINS=${CORS_ORIGINS}  # CORS origins from .env
+      # Add other environment variables as needed
+    depends_on:
+      db:
+        condition: service_healthy  # Wait for DB to be healthy
+    networks:
+      - payment-network
+    volumes:
+      # Uncomment the line below for development (auto-reload on code changes)
+      # - ./p2p_Backend:/app
+    restart: unless-stopped
+    # Health check to verify the backend is running
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # =========================================================================
+  # DATABASE SERVICE - PostgreSQL
+  # =========================================================================
+  db:
+    container_name: p2p-database
+    image: postgres:16-alpine  # Using PostgreSQL 16
+    env_file:
+      - .env  # Load environment variables from .env file
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}  # Database user from .env
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}  # Database password from .env
+      - POSTGRES_DB=${POSTGRES_DB}  # Database name from .env
+    ports:
+      - "${DB_PORT:-5432}:5432"  # Database port from .env, defaults to 5432
+    volumes:
+      # Mount defenseLayer.sql to initialize the database
+      - ./defenseLayer.sql:/docker-entrypoint-initdb.d/01-init.sql
+      # Persist database data
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - payment-network
+    restart: unless-stopped
+    # Health check to verify the database is running
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U paymentuser -d paymentdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+# ============================================================================
+# NETWORKS - Enables inter-service communication
+# ============================================================================
+networks:
+  payment-network:
+    driver: bridge
+
+# ============================================================================
+# VOLUMES - Persists data between container restarts
+# ============================================================================
+volumes:
+  postgres_data:
+    driver: local
+
+# ============================================================================
+# NOTES:
+# ============================================================================
+#
+# 1. SERVICE COMMUNICATION:
+#    - Frontend connects to backend at: http://backend:8000
+#    - Backend connects to database at: postgresql://paymentuser:paymentpass@db:5432/paymentdb
+#
+# 2. UPDATING FRONTEND/BACKEND CODE:
+#    - Modify files in p2p_Frontend or p2p_Backend
+#    - Run: docker-compose up --build
+#    - Containers will rebuild automatically
+#
+# 3. DEVELOPMENT MODE:
+#    - Uncomment the volumes section in the backend service to enable hot-reload
+#    - This allows real-time code updates without rebuilding
+#
+# 4. DATABASE INITIALIZATION:
+#    - The defenseLayer.sql file is automatically executed on first run
+#    - To reset the database, run: docker-compose down -v (removes volumes)
+#
+# 5. DEBUGGING:
+#    - View backend logs: docker-compose logs -f backend
+#    - View frontend logs: docker-compose logs -f frontend
+#    - View database logs: docker-compose logs -f db
+#    - Access backend API docs: http://localhost:8000/docs (Swagger UI)
+#
+# 6. SECURITY NOTES FOR PRODUCTION:
+#    - Change the default database credentials (POSTGRES_USER, POSTGRES_PASSWORD)
+#    - Remove the ports mapping for the database in production
+#    - Use environment files (.env) for sensitive data instead of hardcoding
+#    - Implement proper CORS policies in the backend
+#    - Use secrets management tools for production deployments
+#
+# ============================================================================
