@@ -1,6 +1,10 @@
-#python -m venv venv
-#for windows: .\venv\Scripts\activate
-
-#--------------------
-#-----GIT BASH-------
+# Create a virtual environment
+# python -m venv venv
+# For Windows: .\venv\Scripts\activate
 #source venv/Scripts/activate
+
+# Install backend dependencies
+# pip install -r Requirements.txt
+
+fastapi
+uvicorn[standard]
