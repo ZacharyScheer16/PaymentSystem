@@ -4,6 +4,10 @@ import uuid
 
 from sqlalchemy.orm import Session
 
+from app.core.exceptions import AccountNotFoundError, InsufficientFundsError
+from app.models.account import Account
+from app.models.transaction import EntryType, LedgerEntry, TransactionStatus
+
 
 class TransferService:
     def __init__(self, db: Session):
@@ -39,4 +43,36 @@ class TransferService:
         path is solid (the usual fix is locking the account row for the
         duration of the transfer).
         """
-        raise NotImplementedError
+        senderAccount = self._db.query(Account).filter(Account.id == sender_account_id).first()
+        receiverAccount = self._db.query(Account).filter(Account.id == receiver_account_id).first()
+        if not senderAccount or not receiverAccount:
+            raise AccountNotFoundError
+        if amount <= 0 or senderAccount.balance < amount:
+            raise InsufficientFundsError
+
+        transfer_id = uuid.uuid4()
+
+        debit_entry = LedgerEntry(
+    transfer_id=transfer_id,
+    account_id=senderAccount.id,
+    entry_type=EntryType.DEBIT,
+    amount=amount,
+    status=TransactionStatus.COMPLETED,
+    idempotency_key=idempotency_key,
+)
+        credit_entry = LedgerEntry(
+    transfer_id=transfer_id,
+    account_id=receiverAccount.id,
+    entry_type=EntryType.CREDIT,
+    amount=amount,
+    status=TransactionStatus.COMPLETED,
+    idempotency_key=idempotency_key,
+)
+        senderAccount.balance -= amount
+        receiverAccount.balance += amount
+
+        self._db.add(debit_entry)
+        self._db.add(credit_entry)
+        self._db.commit()
+
+        return transfer_id
