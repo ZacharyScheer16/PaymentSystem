@@ -5,6 +5,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
+from app.core.security import create_access_token
 from app.db.session import get_db
 from app.schemas.account import AccountRead
 from app.schemas.user import AuthResponse, UserCreate, UserLogin, UserRead
@@ -27,6 +28,7 @@ def sign_up(payload: UserCreate, db: Annotated[Session, Depends(get_db)]) -> Aut
     return AuthResponse(
         user=UserRead.model_validate(user),
         account=AccountRead.model_validate(account),
+        access_token=create_access_token(user.id),
     )
 
 
@@ -41,4 +43,5 @@ def login(payload: UserLogin, db: Annotated[Session, Depends(get_db)]) -> AuthRe
     return AuthResponse(
         user=UserRead.model_validate(user),
         account=AccountRead.model_validate(account),
+        access_token=create_access_token(user.id),
     )

@@ -30,6 +30,9 @@ httpx>=0.27
 # Password hashing for user signup
 bcrypt>=4.0
 
+# JWT auth
+pyjwt>=2.8
+
 #how to run backend ----   uvicorn app.main:app --reload
 #.\venv\Scripts\Activate.ps1  uvicorn app.main:app --reload
 #Open http://127.0.0.1:8000/docs

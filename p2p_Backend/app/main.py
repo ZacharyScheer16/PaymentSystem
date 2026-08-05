@@ -13,8 +13,10 @@ from app.core.exceptions import (
     AccountNotFoundError,
     DomainError,
     DuplicateTransferError,
+    ForbiddenError,
     InsufficientFundsError,
     InvalidCredentialsError,
+    InvalidTokenError,
     UsernameAlreadyExistsError,
 )
 from app.core.logging import setup_logging
@@ -31,6 +33,8 @@ _STATUS_BY_EXCEPTION = {
     DuplicateTransferError: 409,
     InsufficientFundsError: 400,
     InvalidCredentialsError: 401,
+    InvalidTokenError: 401,
+    ForbiddenError: 403,
 }
 
 setup_logging()

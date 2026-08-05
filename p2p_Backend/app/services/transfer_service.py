@@ -5,7 +5,7 @@ from decimal import Decimal
 
 from sqlalchemy.orm import Session
 
-from app.core.exceptions import AccountNotFoundError, InsufficientFundsError
+from app.core.exceptions import AccountNotFoundError, ForbiddenError, InsufficientFundsError
 from app.models.account import Account
 from app.models.transaction import EntryType, LedgerEntry, TransactionStatus
 
@@ -21,6 +21,7 @@ class TransferService:
 
     def execute_transfer(
         self,
+        caller_user_id: uuid.UUID,
         sender_account_id: uuid.UUID,
         receiver_account_id: uuid.UUID,
         amount: float,
@@ -57,6 +58,8 @@ class TransferService:
         receiverAccount = self._db.query(Account).filter(Account.id == receiver_account_id).first()
         if not senderAccount or not receiverAccount:
             raise AccountNotFoundError
+        if senderAccount.owner_id != caller_user_id:
+            raise ForbiddenError
         if amount <= 0 or senderAccount.balance < amount:
             raise InsufficientFundsError
 

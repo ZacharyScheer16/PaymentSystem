@@ -27,7 +27,13 @@ class UserRead(BaseModel):
 
 
 class AuthResponse(BaseModel):
-    """What both signup and login return: a user and their account."""
+    """What both signup and login return: a user, their account, and a bearer token.
+
+    The frontend should store `access_token` and send it as
+    `Authorization: Bearer <access_token>` on every subsequent request.
+    """
 
     user: UserRead
     account: AccountRead
+    access_token: str
+    token_type: str = "bearer"

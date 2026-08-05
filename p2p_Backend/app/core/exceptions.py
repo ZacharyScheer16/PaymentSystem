@@ -28,3 +28,11 @@ class UsernameAlreadyExistsError(DomainError):
 
 class InvalidCredentialsError(DomainError):
     """Raised when a login's username doesn't exist or its password doesn't match."""
+
+
+class InvalidTokenError(DomainError):
+    """Raised when a JWT is missing, malformed, expired, or has a bad signature."""
+
+
+class ForbiddenError(DomainError):
+    """Raised when an authenticated user tries to act on an account they don't own."""

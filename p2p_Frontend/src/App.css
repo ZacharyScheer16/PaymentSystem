@@ -5,6 +5,28 @@
   padding: 40px 20px;
 }
 
+.auth-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.auth-toggle button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.auth-toggle button.active {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
 .signup-form {
   display: flex;
   flex-direction: column;
@@ -64,4 +86,15 @@
 
 .result code {
   word-break: break-all;
+}
+
+.result button {
+  margin-top: 16px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-h);
+  font: inherit;
+  cursor: pointer;
 }
