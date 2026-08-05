@@ -26,3 +26,10 @@ class AccountService:
         if not account:
             raise AccountNotFoundError
         return account
+
+    def get_account_by_owner(self, owner_id: uuid.UUID) -> Account:
+        """Fetch the account belonging to a given user."""
+        account = self._db.query(Account).filter(Account.owner_id == owner_id).first()
+        if not account:
+            raise AccountNotFoundError
+        return account

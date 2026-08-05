@@ -20,3 +20,11 @@ class InsufficientFundsError(DomainError):
 
 class DuplicateTransferError(DomainError):
     """Raised when a transfer is retried with an idempotency key that was already processed."""
+
+
+class UsernameAlreadyExistsError(DomainError):
+    """Raised when signing up with a username that's already taken."""
+
+
+class InvalidCredentialsError(DomainError):
+    """Raised when a login's username doesn't exist or its password doesn't match."""

@@ -13,6 +13,11 @@ class UserCreate(BaseModel):
     password: str = Field(min_length=8)
 
 
+class UserLogin(BaseModel):
+    username: str
+    password: str
+
+
 class UserRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -21,8 +26,8 @@ class UserRead(BaseModel):
     created_at: datetime
 
 
-class SignupResponse(BaseModel):
-    """What POST /api/users/ returns: the new user AND the account opened for them."""
+class AuthResponse(BaseModel):
+    """What both signup and login return: a user and their account."""
 
     user: UserRead
     account: AccountRead

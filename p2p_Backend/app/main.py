@@ -6,13 +6,32 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from app.core.config import settings
+from app.core.exceptions import (
+    AccountNotFoundError,
+    DomainError,
+    DuplicateTransferError,
+    InsufficientFundsError,
+    InvalidCredentialsError,
+    UsernameAlreadyExistsError,
+)
 from app.core.logging import setup_logging
 from app.db.base import Base
 from app.db.session import engine
 from app.models import account, transaction, user  # noqa: F401 — import registers tables on Base.metadata
 from app.routes import accounts, transactions, users
+
+# One HTTP status per domain error. DomainError subclasses not listed here
+# fall back to 400 — see handle_domain_error below.
+_STATUS_BY_EXCEPTION = {
+    AccountNotFoundError: 404,
+    UsernameAlreadyExistsError: 409,
+    DuplicateTransferError: 409,
+    InsufficientFundsError: 400,
+    InvalidCredentialsError: 401,
+}
 
 setup_logging()
 logger = logging.getLogger("app")
@@ -34,6 +53,19 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.exception_handler(DomainError)
+async def handle_domain_error(request: Request, exc: DomainError) -> JSONResponse:
+    """Translate any domain exception into a clean HTTP error instead of a raw 500.
+
+    Catches DomainError AND every subclass of it (AccountNotFoundError,
+    InsufficientFundsError, etc.) — Starlette matches exception handlers by
+    walking the class hierarchy, so one handler here covers all of them.
+    """
+    status_code = _STATUS_BY_EXCEPTION.get(type(exc), 400)
+    detail = str(exc) or exc.__class__.__doc__ or exc.__class__.__name__
+    return JSONResponse(status_code=status_code, content={"detail": detail})
 
 
 @app.middleware("http")
