@@ -17,3 +17,12 @@ typing_extensions==4.15.0
 uvicorn==0.49.0
 watchfiles==1.2.0
 websockets==16.0
+
+# Added for the layered architecture (models/repositories/services)
+sqlalchemy>=2.0
+psycopg2-binary>=2.9
+pydantic-settings>=2.0
+
+# Testing
+pytest>=8.0
+httpx>=0.27
