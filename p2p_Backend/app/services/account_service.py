@@ -1,27 +1,28 @@
-"""Business logic for account management. No SQL, no FastAPI — only rules."""
+"""Business logic for account management."""
 
 import uuid
 
+from sqlalchemy.orm import Session
+
+from app.core.exceptions import AccountNotFoundError
 from app.models.account import Account
-from app.repositories.interfaces import AccountRepository
 
 
 class AccountService:
-    def __init__(self, account_repository: AccountRepository):
-        self._account_repository = account_repository
+    def __init__(self, db: Session):
+        self._db = db
 
-    def open_account(self, owner_name: str, currency: str, opening_balance: float) -> Account:
-        """Create a new account.
-
-        TODO: decide + enforce any opening-balance rules (e.g. must be >= 0,
-        which schemas/account.py already validates at the API boundary —
-        should the service re-validate, or trust the caller?).
-        """
-        raise NotImplementedError
+    def open_account(self, owner_id: uuid.UUID, currency: str, opening_balance: float) -> Account:
+        """Create and persist a new account."""
+        account = Account(owner_id=owner_id, currency=currency, balance=opening_balance)
+        self._db.add(account)
+        self._db.commit()
+        self._db.refresh(account)
+        return account
 
     def get_account(self, account_id: uuid.UUID) -> Account:
-        """Fetch an account.
-
-        TODO: raise app.core.exceptions.AccountNotFoundError if it doesn't exist.
-        """
-        raise NotImplementedError
+        """Fetch an account by id."""
+        account = self._db.query(Account).filter(Account.id == account_id).first()
+        if not account:
+            raise AccountNotFoundError
+        return account

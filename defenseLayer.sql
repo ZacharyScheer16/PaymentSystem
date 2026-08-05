@@ -1,3 +1,8 @@
-ALTER TABLE Transactions
-ADD CONSTRAINT check_transaction_type
-CHECK (TransactionType IN ('CREDIT', 'DEBIT'));
+-- Superseded by the SQLAlchemy models in p2p_Backend/app/models/ and the
+-- table-creation script at p2p_Backend/scripts/create_tables.py.
+--
+-- This file previously ran an ALTER TABLE against a `Transactions` table
+-- that was never created — it would have failed on a fresh database. Schema
+-- is now defined in code (Account, LedgerEntry) so it can't drift out of
+-- sync with the ORM. A real migration tool (Alembic) is the natural next
+-- step once the schema stabilizes.

@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker exec *)",
+      "Bash(venv/Scripts/python.exe -c \"from app.core.config import settings; print\\(repr\\(settings.database_url\\)\\)\")",
+      "Bash(venv/Scripts/python.exe -c ' *)"
+    ]
+  }
+}

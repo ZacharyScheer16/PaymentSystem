@@ -89,9 +89,9 @@ services:
         condition: service_healthy  # Wait for DB to be healthy
     networks:
       - payment-network
-    volumes:
-      # Uncomment the line below for development (auto-reload on code changes)
-      # - ./p2p_Backend:/app
+    # For hot-reload during development, add a volumes: block here mounting
+    # ./p2p_Backend:/app — left off by default so `docker-compose up` always
+    # runs the image exactly as built.
     restart: unless-stopped
     # Health check to verify the backend is running
     healthcheck:
@@ -116,9 +116,9 @@ services:
     ports:
       - "${DB_PORT:-5432}:5432"  # Database port from .env, defaults to 5432
     volumes:
-      # Mount defenseLayer.sql to initialize the database
-      - ./defenseLayer.sql:/docker-entrypoint-initdb.d/01-init.sql
-      # Persist database data
+      # Table creation is handled by p2p_Backend/scripts/create_tables.py (or,
+      # later, Alembic migrations) instead of a raw SQL init script — see
+      # defenseLayer.sql for why the old approach was retired.
       - postgres_data:/var/lib/postgresql/data
     networks:
       - payment-network

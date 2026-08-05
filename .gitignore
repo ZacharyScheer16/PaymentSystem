@@ -1,8 +1,11 @@
 # Created by venv; see https://docs.python.org/3/library/venv.html
 
+# Ignore root env file (holds DB credentials used by docker-compose)
+.env
+
 # Ignore backend stuff
 p2p_backend/venv/
-p2p_backend/__pycache__/
+p2p_backend/**/__pycache__/
 p2p_backend/.env
 
 # Ignore frontend stuff
