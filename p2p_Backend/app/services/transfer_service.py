@@ -43,6 +43,10 @@ class TransferService:
         path is solid (the usual fix is locking the account row for the
         duration of the transfer).
         """
+        existing_entry = self._db.query(LedgerEntry).filter(LedgerEntry.idempotency_key == idempotency_key).first()
+        if existing_entry:
+            return existing_entry.transfer_id
+
         senderAccount = self._db.query(Account).filter(Account.id == sender_account_id).first()
         receiverAccount = self._db.query(Account).filter(Account.id == receiver_account_id).first()
         if not senderAccount or not receiverAccount:
