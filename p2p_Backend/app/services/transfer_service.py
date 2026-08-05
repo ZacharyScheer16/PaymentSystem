@@ -1,6 +1,7 @@
 """Business logic for P2P transfers — the core of the payments domain."""
 
 import uuid
+from decimal import Decimal
 
 from sqlalchemy.orm import Session
 
@@ -12,6 +13,11 @@ from app.models.transaction import EntryType, LedgerEntry, TransactionStatus
 class TransferService:
     def __init__(self, db: Session):
         self._db = db
+
+    def get_transfer_entries(self, transfer_id: uuid.UUID) -> list[LedgerEntry]:
+        """Fetch all LedgerEntry rows for a given transfer_id."""
+        entries = self._db.query(LedgerEntry).filter(LedgerEntry.transfer_id == transfer_id).all()
+        return entries
 
     def execute_transfer(
         self,
@@ -55,23 +61,28 @@ class TransferService:
             raise InsufficientFundsError
 
         transfer_id = uuid.uuid4()
+        # Account.balance is a Decimal (Numeric column) but `amount` arrives as a
+        # float from the API — Decimal refuses to mix with float in arithmetic
+        # (that's Python protecting against float rounding errors in money math),
+        # so convert once here before doing any balance math.
+        amount = Decimal(str(amount))
 
         debit_entry = LedgerEntry(
-    transfer_id=transfer_id,
-    account_id=senderAccount.id,
-    entry_type=EntryType.DEBIT,
-    amount=amount,
-    status=TransactionStatus.COMPLETED,
-    idempotency_key=idempotency_key,
-)
+            transfer_id=transfer_id,
+            account_id=senderAccount.id,
+            entry_type=EntryType.DEBIT,
+            amount=amount,
+            status=TransactionStatus.COMPLETED,
+            idempotency_key=idempotency_key,
+        )
         credit_entry = LedgerEntry(
-    transfer_id=transfer_id,
-    account_id=receiverAccount.id,
-    entry_type=EntryType.CREDIT,
-    amount=amount,
-    status=TransactionStatus.COMPLETED,
-    idempotency_key=idempotency_key,
-)
+            transfer_id=transfer_id,
+            account_id=receiverAccount.id,
+            entry_type=EntryType.CREDIT,
+            amount=amount,
+            status=TransactionStatus.COMPLETED,
+            idempotency_key=idempotency_key,
+        )
         senderAccount.balance -= amount
         receiverAccount.balance += amount
 

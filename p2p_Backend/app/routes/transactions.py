@@ -15,5 +15,11 @@ router = APIRouter(prefix="/transfers", tags=["transfers"])
 @router.post("/", response_model=TransferResponse)
 def create_transfer(payload: TransferRequest, db: Annotated[Session, Depends(get_db)]) -> TransferResponse:
     service = TransferService(db)
-    # TODO: call service.execute_transfer(...), then look up + return the resulting entries
-    raise NotImplementedError
+    transfer_id = service.execute_transfer(
+        sender_account_id=payload.sender_account_id,
+        receiver_account_id=payload.receiver_account_id,
+        amount=payload.amount,
+        idempotency_key=payload.idempotency_key,
+    )
+    entries = service.get_transfer_entries(transfer_id)
+    return TransferResponse(transfer_id=transfer_id, entries=entries)
