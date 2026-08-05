@@ -2,6 +2,7 @@
 
 from sqlalchemy.orm import Session
 
+from app.core.security import hash_password
 from app.models.user import User
 
 
@@ -17,7 +18,7 @@ class UserService:
         app.core.security.hash_password() before putting it on the User —
         never store what the caller typed.
         """
-        user = User(username=username, password=password)
+        user = User(username=username, hashed_password=hash_password(password))
         self._db.add(user)
         self._db.commit()
         self._db.refresh(user)
