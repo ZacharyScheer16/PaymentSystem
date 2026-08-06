@@ -18,6 +18,11 @@ class TransferService:
         """Fetch all LedgerEntry rows for a given transfer_id."""
         entries = self._db.query(LedgerEntry).filter(LedgerEntry.transfer_id == transfer_id).all()
         return entries
+    
+    def get_account_entries(self, account_id: uuid.UUID) -> list[LedgerEntry]:
+        entries = self._db.query(LedgerEntry).filter(LedgerEntry.account_id 
+             == account_id).order_by(LedgerEntry.created_at.desc()).all()
+        return entries
 
     def execute_transfer(
         self,

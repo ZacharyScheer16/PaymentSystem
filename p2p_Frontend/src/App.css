@@ -287,3 +287,63 @@
 .result code {
   word-break: break-all;
 }
+
+.balance-display {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-h);
+  margin: 4px 0 20px;
+}
+
+.transactions-heading {
+  margin: 0 0 12px;
+  font-size: 15px;
+  color: var(--text-h);
+}
+
+.transaction-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.transaction-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.transaction-item:last-child {
+  border-bottom: none;
+}
+
+.transaction-type {
+  display: block;
+  font-size: 14px;
+  color: var(--text-h);
+}
+
+.transaction-date {
+  display: block;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.transaction-amount {
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.transaction-amount.positive {
+  color: #2a9d5c;
+}
+
+.transaction-amount.negative {
+  color: #d33;
+}

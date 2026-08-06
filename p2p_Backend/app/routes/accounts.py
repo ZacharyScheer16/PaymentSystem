@@ -9,6 +9,8 @@ from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.schemas.account import AccountCreate, AccountDeposit, AccountRead
 from app.services.account_service import AccountService
+from app.schemas.transaction import LedgerEntryRead
+from app.services.transfer_service import TransferService
 
 router = APIRouter(prefix="/accounts", tags=["accounts"])
 
@@ -36,3 +38,9 @@ def deposit(
     service = AccountService(db)
     account = service.deposit(account_id, payload.amount)
     return account
+
+@router.get("/{account_id}/transfers", response_model=list[LedgerEntryRead])
+def get_account_transfers(account_id: uuid.UUID, db: Annotated[Session, Depends(get_db)]) -> list[LedgerEntryRead]:
+    service = TransferService(db)
+    entries = service.get_account_entries(account_id)
+    return entries
