@@ -275,30 +275,122 @@
 
 /* ---------- Dashboard ---------- */
 
-.result {
-  padding: 20px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  width: 400px;
+.dashboard {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 56px 24px;
+  background: radial-gradient(circle at 50% 0%, var(--accent-bg), transparent 55%);
+}
+
+.dashboard-inner {
+  width: 480px;
   max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
   text-align: left;
 }
 
-.result code {
-  word-break: break-all;
-}
-
-.balance-display {
-  font-size: 28px;
+.dashboard-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  font-size: 16px;
   font-weight: 700;
-  color: var(--text-h);
-  margin: 4px 0 20px;
+  letter-spacing: 0;
 }
 
-.transactions-heading {
-  margin: 0 0 12px;
-  font-size: 15px;
+.dashboard-greeting {
+  font-size: 13px;
+  color: var(--text);
+}
+
+.dashboard-username {
+  margin: 2px 0 0;
+  font-size: 22px;
+  font-weight: 600;
   color: var(--text-h);
+}
+
+.balance-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 28px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  box-shadow: var(--shadow);
+  text-align: left;
+}
+
+.balance-label {
+  font-size: 13px;
+  color: var(--text);
+}
+
+.balance-amount {
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--text-h);
+}
+
+.balance-currency {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.send-money-btn {
+  margin-top: 16px;
+  padding: 11px 20px;
+  border-radius: 8px;
+  border: none;
+  background: var(--accent);
+  color: white;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.send-money-btn:hover {
+  opacity: 0.9;
+}
+
+.activity-card {
+  padding: 24px 28px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  text-align: left;
+}
+
+.activity-heading {
+  margin: 0 0 14px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.empty-state {
+  font-size: 14px;
+  color: var(--text);
 }
 
 .transaction-list {
@@ -307,29 +399,56 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
 }
 
 .transaction-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 10px 0;
+  gap: 12px;
+  padding: 12px 0;
   border-bottom: 1px solid var(--border);
 }
 
 .transaction-item:last-child {
   border-bottom: none;
+  padding-bottom: 0;
+}
+
+.transaction-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.transaction-icon[data-type='DEBIT'] {
+  background: rgba(211, 51, 51, 0.1);
+  color: #d33;
+}
+
+.transaction-icon[data-type='CREDIT'] {
+  background: rgba(42, 157, 92, 0.12);
+  color: #2a9d5c;
+}
+
+.transaction-details {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
 }
 
 .transaction-type {
-  display: block;
   font-size: 14px;
   color: var(--text-h);
 }
 
 .transaction-date {
-  display: block;
   font-size: 12px;
   color: var(--text);
 }
@@ -346,4 +465,59 @@
 
 .transaction-amount.negative {
   color: #d33;
+}
+
+/* ---------- Send Money modal ---------- */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 100;
+}
+
+.modal-card {
+  width: 380px;
+  max-width: 100%;
+  padding: 32px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  box-shadow: var(--shadow);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.modal-actions button {
+  flex: 1;
+}
+
+.btn-secondary {
+  margin-top: 8px;
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-h);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  opacity: 0.7;
+}
+
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

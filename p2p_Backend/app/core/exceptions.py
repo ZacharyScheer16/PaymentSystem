@@ -14,6 +14,10 @@ class AccountNotFoundError(DomainError):
     """Raised when an operation references an account that doesn't exist."""
 
 
+class UserNotFoundError(DomainError):
+    """Raised when an operation references a username that doesn't exist."""
+
+
 class InsufficientFundsError(DomainError):
     """Raised when a transfer would take the sender's balance below zero."""
 

@@ -14,7 +14,19 @@ function App() {
     <div className="page">
       <Navbar auth={auth} onLogout={() => setAuth(null)} />
       <Routes>
-        <Route path="/" element={auth ? <Dashboard auth={auth} /> : <LandingPage />} />
+        <Route
+          path="/"
+          element={
+            auth ? (
+              <Dashboard
+                auth={auth}
+                onBalanceChange={(account) => setAuth((prev) => ({ ...prev, account }))}
+              />
+            ) : (
+              <LandingPage />
+            )
+          }
+        />
         <Route path="/login" element={<LoginPage auth={auth} onAuthSuccess={setAuth} />} />
         <Route path="/signup" element={<SignupPage auth={auth} onAuthSuccess={setAuth} />} />
       </Routes>

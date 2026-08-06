@@ -18,6 +18,7 @@ from app.core.exceptions import (
     InvalidCredentialsError,
     InvalidTokenError,
     UsernameAlreadyExistsError,
+    UserNotFoundError,
 )
 from app.core.logging import setup_logging
 from app.db.base import Base
@@ -29,6 +30,7 @@ from app.routes import accounts, transactions, users
 # fall back to 400 — see handle_domain_error below.
 _STATUS_BY_EXCEPTION = {
     AccountNotFoundError: 404,
+    UserNotFoundError: 404,
     UsernameAlreadyExistsError: 409,
     DuplicateTransferError: 409,
     InsufficientFundsError: 400,

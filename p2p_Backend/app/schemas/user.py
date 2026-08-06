@@ -26,6 +26,13 @@ class UserRead(BaseModel):
     created_at: datetime
 
 
+class RecipientRead(BaseModel):
+    """What the Send Money flow needs to resolve a username into a transfer target."""
+
+    username: str
+    account_id: uuid.UUID
+
+
 class AuthResponse(BaseModel):
     """What both signup and login return: a user, their account, and a bearer token.
 

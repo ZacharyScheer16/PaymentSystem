@@ -5,14 +5,30 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
+from app.core.exceptions import UserNotFoundError
 from app.core.security import create_access_token
 from app.db.session import get_db
 from app.schemas.account import AccountRead
-from app.schemas.user import AuthResponse, UserCreate, UserLogin, UserRead
+from app.schemas.user import AuthResponse, RecipientRead, UserCreate, UserLogin, UserRead
 from app.services.account_service import AccountService
 from app.services.user_service import UserService
 
 router = APIRouter(prefix="/users", tags=["users"])
+
+
+@router.get("/{username}/recipient", response_model=RecipientRead)
+def get_recipient(username: str, db: Annotated[Session, Depends(get_db)]) -> RecipientRead:
+    """Resolve a username to an account_id — used by the Send Money flow to
+    find a transfer target without exposing raw account UUIDs to look up."""
+    user_service = UserService(db)
+    account_service = AccountService(db)
+
+    user = user_service.get_user_by_username(username)
+    if not user:
+        raise UserNotFoundError
+
+    account = account_service.get_account_by_owner(user.id)
+    return RecipientRead(username=user.username, account_id=account.id)
 
 
 @router.post("/", response_model=AuthResponse)
