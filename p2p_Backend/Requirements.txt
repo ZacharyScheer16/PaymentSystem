@@ -21,6 +21,7 @@ websockets==16.0
 # Added for the layered architecture (models/repositories/services)
 sqlalchemy>=2.0
 psycopg2-binary>=2.9
+pymysql>=1.1
 pydantic-settings>=2.0
 
 # Testing

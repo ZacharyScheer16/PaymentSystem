@@ -29,33 +29,31 @@ class TransferService:
     ) -> uuid.UUID:
         """Move `amount` from sender to receiver as a single atomic operation.
 
-        Suggested algorithm (fill in as you implement):
-          1. Check `idempotency_key` — if a LedgerEntry already exists with it,
-             return that transfer_id instead of double-applying the transfer.
-          2. Load both accounts; raise AccountNotFoundError if either is missing.
-          3. Validate amount > 0 and sender.balance >= amount; raise
-             InsufficientFundsError otherwise.
-          4. Generate a new transfer_id (uuid.uuid4()) shared by both entries.
-          5. Create a DEBIT LedgerEntry for the sender and a CREDIT LedgerEntry
-             for the receiver, update both account balances.
-          6. Commit — both entries and both balance updates succeed together,
-             or (on error) neither does.
-          7. Return the transfer_id.
-
-        Once this works for one request at a time, the interesting problem
-        starts: what happens if two transfers touching the SAME sender
-        account arrive at once? Both could read the same starting balance,
-        both pass the funds check, both deduct — overdrawing the account.
-        That's a race condition. We'll tackle it deliberately once the happy
-        path is solid (the usual fix is locking the account row for the
-        duration of the transfer).
+        Both account rows are locked with SELECT ... FOR UPDATE (in a
+        consistent id order, to avoid deadlocking against a concurrent
+        transfer running in the opposite direction) before the balance check,
+        so two transfers racing on the same sender account can't both read
+        the same starting balance and overdraw it.
         """
         existing_entry = self._db.query(LedgerEntry).filter(LedgerEntry.idempotency_key == idempotency_key).first()
         if existing_entry:
             return existing_entry.transfer_id
 
-        senderAccount = self._db.query(Account).filter(Account.id == sender_account_id).first()
-        receiverAccount = self._db.query(Account).filter(Account.id == receiver_account_id).first()
+        # Lock both account rows for the duration of this transaction so a
+        # concurrent transfer touching either account can't read a stale
+        # balance. Always lock in a consistent order (sorted by id) — if two
+        # transfers move money in opposite directions between the same pair
+        # of accounts, locking sender-then-receiver in each would deadlock.
+        locked_accounts = {
+            account.id: account
+            for account in self._db.query(Account)
+            .filter(Account.id.in_([sender_account_id, receiver_account_id]))
+            .order_by(Account.id)
+            .with_for_update()
+            .all()
+        }
+        senderAccount = locked_accounts.get(sender_account_id)
+        receiverAccount = locked_accounts.get(receiver_account_id)
         if not senderAccount or not receiverAccount:
             raise AccountNotFoundError
         if senderAccount.owner_id != caller_user_id:
