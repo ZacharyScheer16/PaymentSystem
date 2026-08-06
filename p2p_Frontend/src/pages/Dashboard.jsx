@@ -1,9 +1,8 @@
-function Dashboard({ auth, onLogout }) {
+function Dashboard({ auth }) {
   const { user, account } = auth
 
   return (
-    <div id="center">
-      <h1>Payment Project</h1>
+    <div className="page-content">
       <div className="result">
         <h2>Welcome, {user.username}!</h2>
         <p>
@@ -15,7 +14,6 @@ function Dashboard({ auth, onLogout }) {
         <p>
           Balance: {account.balance} {account.currency}
         </p>
-        <button onClick={onLogout}>Log Out</button>
       </div>
     </div>
   )

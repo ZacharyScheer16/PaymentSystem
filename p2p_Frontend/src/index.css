@@ -55,11 +55,9 @@ body {
 }
 
 #root {
-  width: 1126px;
-  max-width: 100%;
+  width: 100%;
   margin: 0 auto;
   text-align: center;
-  border-inline: 1px solid var(--border);
   min-height: 100svh;
   display: flex;
   flex-direction: column;
@@ -75,6 +73,12 @@ h2 {
 
 h1 {
   font-size: 56px;
+  /* Explicit line-height because the root's `font: 18px/145%` shorthand sets
+     a FIXED pixel line-height that gets inherited as-is (percentage
+     line-height computes once at the ancestor, not per-element) — without
+     this, a wrapped h1 at 56px overlaps itself using a ~26px line-height
+     meant for 18px text. */
+  line-height: 1.15;
   letter-spacing: -1.68px;
   margin: 32px 0;
   @media (max-width: 1024px) {

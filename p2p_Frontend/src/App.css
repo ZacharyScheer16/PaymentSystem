@@ -1,39 +1,209 @@
-#center {
+/* ---------- Page shell + navbar ---------- */
+
+.page {
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 40px 20px;
 }
 
-.auth-toggle {
+.navbar {
   display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 56px;
+  border-bottom: 1px solid var(--border);
 }
 
-.auth-toggle button {
-  padding: 8px 16px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 14px;
+  border: none;
   background: transparent;
-  color: var(--text);
+  color: var(--text-h);
   font: inherit;
+  font-weight: 500;
+  text-decoration: none;
   cursor: pointer;
 }
 
-.auth-toggle button.active {
+.nav-cta {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 18px;
+  border-radius: 6px;
+  border: none;
   background: var(--accent);
   color: white;
-  border-color: var(--accent);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.nav-cta:hover {
+  opacity: 0.9;
+}
+
+@media (max-width: 600px) {
+  .navbar {
+    padding: 16px 20px;
+  }
+}
+
+/* ---------- Landing page ---------- */
+
+.landing {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  background: radial-gradient(circle at 50% 0%, var(--accent-bg), transparent 60%);
+}
+
+.landing-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  max-width: 620px;
+  text-align: center;
+}
+
+.landing-brand h1 {
+  margin: 0;
+}
+
+.landing-subtitle {
+  font-size: 17px;
+  line-height: 150%;
+  color: var(--text);
+}
+
+.feature-list {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  max-width: 440px;
+  text-align: left;
+}
+
+.feature-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.feature-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  font-size: 12px;
+}
+
+.feature-list strong {
+  display: block;
+  color: var(--text-h);
+  font-size: 15px;
+}
+
+.feature-list p {
+  margin: 2px 0 0;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.landing-cta {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.brand-badge {
+  display: inline-flex;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+}
+
+/* ---------- Auth pages (login/signup) ---------- */
+
+.auth-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+
+.auth-card {
+  width: 380px;
+  max-width: 100%;
+  padding: 32px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  box-shadow: var(--shadow);
+}
+
+/* ---------- Generic centered page content (e.g. Dashboard) ---------- */
+
+.page-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+
+@media (max-width: 600px) {
+  .landing {
+    padding: 40px 20px;
+  }
+}
+
+/* ---------- Shared form styling ---------- */
+
+.form-subtitle {
+  margin: -8px 0 4px;
+  font-size: 14px;
+  color: var(--text);
 }
 
 .signup-form {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  width: 320px;
-  max-width: 100%;
-  margin: 8px auto 24px;
+  width: 100%;
+  text-align: left;
+}
+
+.signup-form h2 {
   text-align: left;
 }
 
@@ -54,6 +224,11 @@
   font: inherit;
 }
 
+.signup-form input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
 .signup-form button {
   margin-top: 8px;
   padding: 10px 16px;
@@ -62,7 +237,13 @@
   background: var(--accent);
   color: white;
   font: inherit;
+  font-weight: 600;
   cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.signup-form button:hover:not(:disabled) {
+  opacity: 0.9;
 }
 
 .signup-form button:disabled {
@@ -70,10 +251,29 @@
   cursor: not-allowed;
 }
 
-.error {
-  color: #d33;
-  max-width: 320px;
+.form-switch {
+  margin-top: 20px;
+  font-size: 14px;
+  color: var(--text);
 }
+
+.text-link {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.text-link:hover {
+  text-decoration: underline;
+}
+
+.error {
+  margin-top: 16px;
+  color: #d33;
+  font-size: 14px;
+}
+
+/* ---------- Dashboard ---------- */
 
 .result {
   padding: 20px;
@@ -86,15 +286,4 @@
 
 .result code {
   word-break: break-all;
-}
-
-.result button {
-  margin-top: 16px;
-  padding: 8px 16px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text-h);
-  font: inherit;
-  cursor: pointer;
 }
