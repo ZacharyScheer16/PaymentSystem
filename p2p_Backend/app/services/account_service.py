@@ -1,6 +1,7 @@
 """Business logic for account management."""
 
 import uuid
+from decimal import Decimal
 
 from sqlalchemy.orm import Session
 
@@ -32,4 +33,14 @@ class AccountService:
         account = self._db.query(Account).filter(Account.owner_id == owner_id).first()
         if not account:
             raise AccountNotFoundError
+        return account
+
+    def deposit(self, account_id: uuid.UUID, amount: float) -> Account:
+        """Add funds to an account. Admin/testing tool — no real funding source is wired up yet."""
+        account = self._db.query(Account).filter(Account.id == account_id).with_for_update().first()
+        if not account:
+            raise AccountNotFoundError
+        account.balance += Decimal(str(amount))
+        self._db.commit()
+        self._db.refresh(account)
         return account

@@ -12,6 +12,10 @@ class AccountCreate(BaseModel):
     opening_balance: float = Field(default=0, ge=0)
 
 
+class AccountDeposit(BaseModel):
+    amount: float = Field(gt=0)
+
+
 class AccountRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
