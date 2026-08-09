@@ -25,8 +25,12 @@ def sign_up(client: httpx.Client, username: str) -> dict:
     return response.json()
 
 
-def deposit(client: httpx.Client, account_id: str, amount: float) -> dict:
-    response = client.post(f"{BASE_URL}/accounts/{account_id}/deposit", json={"amount": amount})
+def deposit(client: httpx.Client, token: str, account_id: str, amount: float) -> dict:
+    response = client.post(
+        f"{BASE_URL}/accounts/{account_id}/deposit",
+        json={"amount": amount, "idempotency_key": str(uuid.uuid4())},
+        headers={"Authorization": f"Bearer {token}"},
+    )
     response.raise_for_status()
     return response.json()
 
@@ -59,7 +63,7 @@ def test_overdraft_race(client: httpx.Client) -> None:
     unique = uuid.uuid4().hex[:8]
     alice = sign_up(client, f"alice_{unique}")
     bob = sign_up(client, f"bob_{unique}")
-    deposit(client, alice["account"]["id"], 100)
+    deposit(client, alice["access_token"], alice["account"]["id"], 100)
 
     successes = 0
     failures = 0
@@ -99,8 +103,8 @@ def test_deadlock_avoidance(client: httpx.Client) -> None:
     unique = uuid.uuid4().hex[:8]
     carol = sign_up(client, f"carol_{unique}")
     dave = sign_up(client, f"dave_{unique}")
-    deposit(client, carol["account"]["id"], 1000)
-    deposit(client, dave["account"]["id"], 1000)
+    deposit(client, carol["access_token"], carol["account"]["id"], 1000)
+    deposit(client, dave["access_token"], dave["account"]["id"], 1000)
 
     rounds = 30
     errors = 0

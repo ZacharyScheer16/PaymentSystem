@@ -14,6 +14,7 @@ class AccountCreate(BaseModel):
 
 class AccountDeposit(BaseModel):
     amount: float = Field(gt=0)
+    idempotency_key: str = Field(min_length=1, max_length=255)
 
 
 class AccountRead(BaseModel):

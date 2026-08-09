@@ -356,20 +356,38 @@
   color: var(--text);
 }
 
-.send-money-btn {
+.balance-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
   margin-top: 16px;
+}
+
+.send-money-btn,
+.add-money-btn {
   padding: 11px 20px;
   border-radius: 8px;
-  border: none;
-  background: var(--accent);
-  color: white;
   font: inherit;
   font-weight: 600;
   cursor: pointer;
   transition: opacity 0.15s;
 }
 
-.send-money-btn:hover {
+.send-money-btn {
+  border: none;
+  background: var(--accent);
+  color: white;
+}
+
+/* Outlined rather than filled, so "Send Money" stays the primary action. */
+.add-money-btn {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-h);
+}
+
+.send-money-btn:hover,
+.add-money-btn:hover {
   opacity: 0.9;
 }
 

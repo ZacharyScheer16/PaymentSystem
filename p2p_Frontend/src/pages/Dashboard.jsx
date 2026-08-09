@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import SendMoneyModal from '../components/SendMoneyModal'
+import DepositModal from '../components/DepositModal'
 import { API_BASE } from '../api'
 
 function formatDate(isoString) {
@@ -21,6 +22,7 @@ function Dashboard({ auth, onBalanceChange }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [showSendModal, setShowSendModal] = useState(false)
+  const [showDepositModal, setShowDepositModal] = useState(false)
 
   const loadTransactions = useCallback(async () => {
     setLoading(true)
@@ -64,6 +66,15 @@ function Dashboard({ auth, onBalanceChange }) {
     await Promise.all([loadTransactions(), refreshAccount()])
   }
 
+  async function handleDepositSuccess(updatedAccount) {
+    setShowDepositModal(false)
+    // The deposit endpoint returns the updated account, so the balance comes
+    // straight from the response — no extra refreshAccount() round trip. The
+    // deposit does write a CREDIT ledger entry though, so reload the activity.
+    onBalanceChange(updatedAccount)
+    await loadTransactions()
+  }
+
   return (
     <div className="dashboard">
       <div className="dashboard-inner">
@@ -82,9 +93,14 @@ function Dashboard({ auth, onBalanceChange }) {
           <span className="balance-amount">
             {Number(account.balance).toFixed(2)} <span className="balance-currency">{account.currency}</span>
           </span>
-          <button type="button" className="send-money-btn" onClick={() => setShowSendModal(true)}>
-            Send Money
-          </button>
+          <div className="balance-actions">
+            <button type="button" className="send-money-btn" onClick={() => setShowSendModal(true)}>
+              Send Money
+            </button>
+            <button type="button" className="add-money-btn" onClick={() => setShowDepositModal(true)}>
+              Add Money
+            </button>
+          </div>
         </section>
 
         <section className="activity-card">
@@ -121,6 +137,10 @@ function Dashboard({ auth, onBalanceChange }) {
 
       {showSendModal && (
         <SendMoneyModal auth={auth} onClose={() => setShowSendModal(false)} onSuccess={handleSendSuccess} />
+      )}
+
+      {showDepositModal && (
+        <DepositModal auth={auth} onClose={() => setShowDepositModal(false)} onSuccess={handleDepositSuccess} />
       )}
     </div>
   )
