@@ -1,6 +1,5 @@
 import { useState } from 'react'
-
-const API_BASE = 'http://127.0.0.1:8000/api'
+import { API_BASE } from '../api'
 
 function SendMoneyModal({ auth, onClose, onSuccess }) {
   const [recipientUsername, setRecipientUsername] = useState('')

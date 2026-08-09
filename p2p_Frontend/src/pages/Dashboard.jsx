@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import SendMoneyModal from '../components/SendMoneyModal'
-
-const API_BASE = 'http://127.0.0.1:8000/api'
+import { API_BASE } from '../api'
 
 function formatDate(isoString) {
   return new Date(isoString).toLocaleString(undefined, {

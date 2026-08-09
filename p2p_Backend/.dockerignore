@@ -1,0 +1,16 @@
+venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+
+# Never bake the local SQLite file into the image — it would shadow MySQL
+# and ship real data into the container.
+*.db
+
+# Local secrets stay local; compose injects the real values as env vars.
+.env
+
+.git
+.gitignore
+README.md
