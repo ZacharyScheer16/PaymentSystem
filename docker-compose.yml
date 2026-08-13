@@ -76,7 +76,13 @@ services:
   db:
     container_name: p2p-database
     image: mysql:8.0
-    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    # MUST match the COLLATE that p2p_DB/seed.sql declares on every table
+    # (utf8mb4_0900_ai_ci, MySQL 8's own default). The schema default is what
+    # tables created at runtime by Base.metadata.create_all inherit, and MySQL
+    # rejects a foreign key whose two columns differ in collation — so a
+    # mismatch here makes any NEW table that references a seeded one fail to
+    # create with "error 3780: ... are incompatible".
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_0900_ai_ci
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
