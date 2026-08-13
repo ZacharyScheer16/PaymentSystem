@@ -14,26 +14,32 @@ from app.core.exceptions import (
     DomainError,
     DuplicateTransferError,
     ForbiddenError,
+    FriendshipAlreadyExistsError,
+    FriendshipNotFoundError,
     InsufficientFundsError,
     InvalidCredentialsError,
     InvalidTokenError,
+    SelfFriendshipError,
     UsernameAlreadyExistsError,
     UserNotFoundError,
 )
 from app.core.logging import setup_logging
 from app.db.base import Base
 from app.db.session import engine
-from app.models import account, transaction, user  # noqa: F401 — import registers tables on Base.metadata
-from app.routes import accounts, transactions, users
+from app.models import account, friendship, transaction, user  # noqa: F401 — import registers tables on Base.metadata
+from app.routes import accounts, friends, transactions, users
 
 # One HTTP status per domain error. DomainError subclasses not listed here
 # fall back to 400 — see handle_domain_error below.
 _STATUS_BY_EXCEPTION = {
     AccountNotFoundError: 404,
     UserNotFoundError: 404,
+    FriendshipNotFoundError: 404,
     UsernameAlreadyExistsError: 409,
     DuplicateTransferError: 409,
+    FriendshipAlreadyExistsError: 409,
     InsufficientFundsError: 400,
+    SelfFriendshipError: 400,
     InvalidCredentialsError: 401,
     InvalidTokenError: 401,
     ForbiddenError: 403,
@@ -86,6 +92,7 @@ async def log_requests(request: Request, call_next):
 app.include_router(users.router, prefix="/api")
 app.include_router(accounts.router, prefix="/api")
 app.include_router(transactions.router, prefix="/api")
+app.include_router(friends.router, prefix="/api")
 
 
 @app.get("/")

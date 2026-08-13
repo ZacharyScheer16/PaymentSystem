@@ -13,9 +13,9 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from app.core.security import decode_access_token
 
 # Expects an `Authorization: Bearer <token>` header. If it's missing entirely,
-# FastAPI/Starlette's HTTPBearer raises its own 403 before our code even
-# runs — a well-known FastAPI quirk (401 would arguably be more correct for
-# "not authenticated at all", but that's the library's default behavior).
+# FastAPI/Starlette's HTTPBearer raises 401 before our code even runs. (Older
+# FastAPI returned 403 here — a long-standing quirk since corrected upstream —
+# so anything asserting 403 on a missing header is out of date.)
 _bearer_scheme = HTTPBearer()
 
 

@@ -1,19 +1,50 @@
-"""User signup and login endpoints."""
+"""User signup, login, and directory-search endpoints."""
 
+import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
+from app.core.auth import get_current_user_id
 from app.core.exceptions import UserNotFoundError
 from app.core.security import create_access_token
 from app.db.session import get_db
 from app.schemas.account import AccountRead
+from app.schemas.friend import UserSearchResult
 from app.schemas.user import AuthResponse, RecipientRead, UserCreate, UserLogin, UserRead
 from app.services.account_service import AccountService
+from app.services.friend_service import FriendService
 from app.services.user_service import UserService
 
 router = APIRouter(prefix="/users", tags=["users"])
+
+
+# Declared before /{username}/recipient so "search" is never read as a username.
+@router.get("/search", response_model=list[UserSearchResult])
+def search_users(
+    db: Annotated[Session, Depends(get_db)],
+    current_user_id: Annotated[uuid.UUID, Depends(get_current_user_id)],
+    q: Annotated[str, Query(max_length=50)] = "",
+    limit: Annotated[int, Query(ge=1, le=25)] = 10,
+) -> list[UserSearchResult]:
+    """Typeahead lookup for the Send Money and Add Friend inputs.
+
+    Requires a token: this is the one endpoint that will happily enumerate
+    usernames, so it shouldn't be open to anonymous callers. Being
+    authenticated also gives us the caller's id for free, which is what lets us
+    drop them from their own results and mark who's already a friend.
+    """
+    user_service = UserService(db)
+    friend_service = FriendService(db)
+
+    matches = user_service.search_users(q, exclude_user_id=current_user_id, limit=limit)
+    friend_ids = friend_service.get_friend_ids(current_user_id)
+
+    return [
+        UserSearchResult(id=user.id, username=user.username, is_friend=user.id in friend_ids)
+        for user in matches
+    ]
 
 
 @router.get("/{username}/recipient", response_model=RecipientRead)

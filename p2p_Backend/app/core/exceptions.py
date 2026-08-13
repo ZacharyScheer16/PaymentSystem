@@ -34,6 +34,18 @@ class InvalidCredentialsError(DomainError):
     """Raised when a login's username doesn't exist or its password doesn't match."""
 
 
+class FriendshipAlreadyExistsError(DomainError):
+    """Raised when adding a friend who is already on the caller's list."""
+
+
+class SelfFriendshipError(DomainError):
+    """Raised when a user tries to add themselves as a friend."""
+
+
+class FriendshipNotFoundError(DomainError):
+    """Raised when removing a friend who isn't on the caller's list."""
+
+
 class InvalidTokenError(DomainError):
     """Raised when a JWT is missing, malformed, expired, or has a bad signature."""
 
