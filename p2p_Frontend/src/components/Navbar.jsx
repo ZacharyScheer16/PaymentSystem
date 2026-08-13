@@ -8,9 +8,14 @@ function Navbar({ auth, onLogout }) {
       </Link>
       <div className="navbar-actions">
         {auth ? (
-          <button type="button" className="nav-link" onClick={onLogout}>
-            Log Out
-          </button>
+          <>
+            <Link to="/friends" className="nav-link">
+              Friends
+            </Link>
+            <button type="button" className="nav-link" onClick={onLogout}>
+              Log Out
+            </button>
+          </>
         ) : (
           <>
             <Link to="/login" className="nav-link">

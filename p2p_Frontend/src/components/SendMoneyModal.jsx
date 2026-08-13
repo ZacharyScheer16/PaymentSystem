@@ -1,15 +1,34 @@
-import { useState } from 'react'
-import { API_BASE } from '../api'
+import { useEffect, useState } from 'react'
+import UserSearchInput from './UserSearchInput'
+import { API_BASE, fetchFriends } from '../api'
 
-function SendMoneyModal({ auth, onClose, onSuccess }) {
-  const [recipientUsername, setRecipientUsername] = useState('')
+function SendMoneyModal({ auth, onClose, onSuccess, initialRecipient = '' }) {
+  const [recipientUsername, setRecipientUsername] = useState(initialRecipient)
   const [amount, setAmount] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [friends, setFriends] = useState([])
+
+  // Your friends fill the dropdown before you've typed anything, so the common
+  // case is one click. A failure here is non-fatal — search still works, you
+  // just don't get the head start.
+  useEffect(() => {
+    const controller = new AbortController()
+    fetchFriends(auth, controller.signal)
+      .then(setFriends)
+      .catch(() => {})
+    return () => controller.abort()
+  }, [auth])
 
   async function handleSubmit(event) {
     event.preventDefault()
     setError('')
+
+    // The typeahead is not a native <input required>, so the empty case is ours to catch.
+    if (!recipientUsername.trim()) {
+      setError('Pick a recipient.')
+      return
+    }
 
     if (recipientUsername.trim().toLowerCase() === auth.user.username.toLowerCase()) {
       setError("You can't send money to yourself.")
@@ -58,13 +77,15 @@ function SendMoneyModal({ auth, onClose, onSuccess }) {
           <p className="form-subtitle">Instantly transfer funds to another Payment Project user.</p>
 
           <label>
-            Recipient username
-            <input
-              type="text"
-              value={recipientUsername}
-              onChange={(e) => setRecipientUsername(e.target.value)}
-              placeholder="e.g. alice"
-              required
+            Recipient
+            <UserSearchInput
+              auth={auth}
+              initialQuery={initialRecipient}
+              onSelect={(user) => setRecipientUsername(user.username)}
+              onQueryChange={setRecipientUsername}
+              placeholder="Search by username…"
+              defaultOptions={friends}
+              defaultLabel="Your friends"
             />
           </label>
 

@@ -2,19 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import SendMoneyModal from '../components/SendMoneyModal'
 import DepositModal from '../components/DepositModal'
 import { API_BASE } from '../api'
-
-function formatDate(isoString) {
-  return new Date(isoString).toLocaleString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  })
-}
-
-function initials(username) {
-  return username.slice(0, 2).toUpperCase()
-}
+import { formatDate, initials } from '../format'
 
 function Dashboard({ auth, onBalanceChange }) {
   const { user, account } = auth

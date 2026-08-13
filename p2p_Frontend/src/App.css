@@ -539,3 +539,192 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* ---------- Typeahead (Add friend + Send Money recipient) ---------- */
+
+.typeahead {
+  position: relative;
+}
+
+.typeahead-input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-h);
+  font: inherit;
+}
+
+.typeahead-input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* Absolute so the rows float over whatever follows instead of shoving the
+   Amount field down the modal as you type. */
+.typeahead-dropdown {
+  position: absolute;
+  z-index: 10;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 6px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  box-shadow: var(--shadow);
+}
+
+.typeahead-section-label {
+  padding: 6px 8px 4px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.typeahead-status {
+  padding: 10px 8px;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.typeahead-error {
+  color: #d33;
+}
+
+.typeahead-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.typeahead-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.typeahead-option.is-highlighted {
+  background: var(--accent-bg);
+}
+
+.typeahead-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.typeahead-username {
+  flex: 1;
+  font-size: 15px;
+  color: var(--text-h);
+}
+
+.typeahead-badge {
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.typeahead-badge.is-muted {
+  background: var(--social-bg);
+  color: var(--text);
+}
+
+/* ---------- Friends page ---------- */
+
+/* The "Add a friend" card is as wide as the page; a full-width search box in
+   it looks stretched, so cap it and center it instead. (SendMoneyModal's
+   .typeahead-input stays full-width — it's a normal field in a narrow form.) */
+.friend-search-wrap {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.friend-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.friend-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.friend-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.friend-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.friend-username {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.friend-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-small {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-h);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.btn-small:hover {
+  opacity: 0.7;
+}
+
+.btn-danger {
+  color: #d33;
+  border-color: rgba(211, 51, 51, 0.35);
+}
